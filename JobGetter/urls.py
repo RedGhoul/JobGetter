@@ -22,5 +22,4 @@ from JobGetter.settings import STATIC_URL, STATIC_ROOT
 urlpatterns = [
                   path('jobber/', include('jobber.urls')),
                   path('admin/', admin.site.urls),
-                  (r'^static/(?P<path>.*)$', 'django.views.static.serve'),
               ] + static(STATIC_URL, document_root=STATIC_ROOT)
