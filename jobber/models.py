@@ -24,7 +24,7 @@ class MaxResultsPerCity(models.Model):
     MaxNumber = models.IntegerField()
 
     def __str__(self):
-        return self.MaxNumber
+        return str(self.MaxNumber)
 
 class Host(models.Model):
     Host = models.TextField(unique=True)
