@@ -34,5 +34,5 @@ EXPOSE 8080
 
 RUN python manage.py collectstatic --noinput
 
-CMD gunicorn JobGetter.wsgi:application --workers=5 --bind 0.0.0.0:8080 & python manage.py qcluster 
+CMD gunicorn JobGetter.wsgi:application --workers=2 --bind 0.0.0.0:8080 & python manage.py qcluster 
 
