@@ -85,7 +85,7 @@ DATABASES = {
         'USER': config('DBUSERNAME',default='JobGetter'),
         'PASSWORD': config('DBPASSWORD',default='JobGetter'),
         'HOST': config('DBHOST',default='127.0.0.1'),
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
