@@ -33,7 +33,6 @@ RUN pip install -r requirements.txt
 EXPOSE 8080
 
 RUN python manage.py collectstatic --noinput
-RUN python manage.py migrate
 
 CMD gunicorn JobGetter.wsgi:application --workers=5 --bind 0.0.0.0:8080 & python manage.py qcluster 
 

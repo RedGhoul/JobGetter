@@ -27,7 +27,7 @@ SECRET_KEY = '4amx%hgth!!d7i6lq-^1wiwu%n#*dha@#6y$@)6@vve)6nxw!!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
@@ -85,7 +85,7 @@ DATABASES = {
         'USER': config('DBUSERNAME'),
         'PASSWORD': config('DBPASSWORD'),
         'HOST': config('DBHOST'),
-        'PORT': '5432',
+        'PORT': '5433',
     }
 }
 
