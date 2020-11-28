@@ -20,6 +20,7 @@ from django.conf.urls import include
 from jobber import views
 from JobGetter.settings import STATIC_URL, STATIC_ROOT
 urlpatterns = [
+                  path('', views.index, name='index'),
                   path('jobber/', include('jobber.urls')),
                   path('admin/', admin.site.urls),
               ] + static(STATIC_URL, document_root=STATIC_ROOT)
