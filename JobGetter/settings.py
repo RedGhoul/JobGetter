@@ -81,10 +81,10 @@ WSGI_APPLICATION = 'JobGetter.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DBNAME'),
-        'USER': config('DBUSERNAME'),
-        'PASSWORD': config('DBPASSWORD'),
-        'HOST': config('DBHOST'),
+        'NAME': config('DBNAME',default='JobGetter'),
+        'USER': config('DBUSERNAME',default='JobGetter'),
+        'PASSWORD': config('DBPASSWORD',default='JobGetter'),
+        'HOST': config('DBHOST',default='127.0.0.1'),
         'PORT': '5433',
     }
 }
