@@ -28,7 +28,8 @@ SECRET_KEY = '4amx%hgth!!d7i6lq-^1wiwu%n#*dha@#6y$@)6@vve)6nxw!!'
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = ['*']
+DEBUG404 = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = ['job-getter.experimentsinthedeep3.com']
 
 # Application definition
 # pip freeze > requirements.txt
