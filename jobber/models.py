@@ -1,6 +1,11 @@
 from django.db import models
 
 # Create your models here.
+class MaxAge(models.Model):
+    Age = models.IntegerField()
+
+    def __str__(self):
+        return str(self.Age)
 
 class JobPositionItem(models.Model):
     Name = models.TextField(unique=True)

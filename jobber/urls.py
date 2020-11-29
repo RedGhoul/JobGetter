@@ -6,5 +6,4 @@ from django.urls import path
 app_name = 'jobber'
 urlpatterns = [
     path('', views.index, name='index'),
-    #path('startJobTest', views.startJobTest, name='startJobTest'),
 ]

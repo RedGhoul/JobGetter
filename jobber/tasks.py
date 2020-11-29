@@ -7,8 +7,9 @@ import time
 from datetime import datetime
 import json
 import os
+from decouple import config
 import threading
-from jobber.models import JobPositionItem, JobCitySetItem, JobTypeFind, MaxResultsPerCity, Host, JobTransparencyLinks
+from jobber.models import JobPositionItem, JobCitySetItem, JobTypeFind, MaxResultsPerCity, Host, JobTransparencyLinks,MaxAge
 
 def GetJobs_Task():
     header = {
@@ -27,7 +28,7 @@ def GetJobs_Task():
     for item in JobCitySetItem.objects.all():
         city_set.append(str(item))
 
-    max_age = "15"
+    max_age = MaxAge.objects.first().Age
     host = Host.objects.first().Host
     techTrans = JobTransparencyLinks.objects.first().TechTrans
     techTransCheck = JobTransparencyLinks.objects.first().TechTransCheck
@@ -148,7 +149,6 @@ def GetJobs_Task():
         for city in city_set:
             for pos in postionFind:
                 for start in range(0, max_results_per_city, 10):
-                    # dotheWork()
                     thread1 = threading.Thread(
                         target=dotheWork,
                         args=(city, pos, start, city + pos + str(start) + finalFileName),
@@ -163,11 +163,21 @@ def GetJobs_Task():
 
     def startup():
         start = time.time()
-        print("Starting Scrapping")
         Indeed()
-        print("Completed Scrapping")
         end = time.time()
         total_time_needed = end - start
         newJobCount = len(jobs_done)
+        send_simple_message(newJobCount,total_time_needed)
+
+    def send_simple_message(JobsFound, ElapsedTime):
+        return requests.post(
+            "https://api.mailgun.net/v3/experimentsinthedeep2.com/messages",
+            auth=("api",config('YOUR_API_KEY',default='JobGetter')),
+            data={"from": "JobGetter@experimentsinthedeep2.com",
+                  "to": ["avaneesab5@gmail.com"],
+                  "subject": "Job Status - JobGetter",
+                  "text":
+                      f'Total Number of Jobs Found: {str(JobsFound)} ' +
+                      f'& Total Time Taken {str(ElapsedTime)}'})
 
     startup()
