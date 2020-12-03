@@ -42,9 +42,10 @@ INSTALLED_APPS = [
     'django_q',
     'jobber',
 ]
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -81,8 +82,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('DBNAME',default='JobGetter'),
-        'USER': config('DBUSERNAME',default='JobGetter'),
-        'PASSWORD': config('DBPASSWORD',default='JobGetter'),
+        'USER': config('DBUSERNAME',default='postgres'),
+        'PASSWORD': config('DBPASSWORD',default='Basappa123)'),
         'HOST': config('DBHOST',default='127.0.0.1'),
         'PORT': '5432',
     }

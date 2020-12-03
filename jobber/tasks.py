@@ -10,7 +10,7 @@ import os
 from decouple import config
 import threading
 from jobber.models import JobPositionItem, JobCitySetItem, JobTypeFind, MaxResultsPerCity, Host, JobTransparencyLinks,MaxAge
-
+#pip freeze > requirements.txt
 def GetJobs_Task():
     header = {
         "Content-type": "application/json",
