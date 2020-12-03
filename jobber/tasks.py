@@ -55,7 +55,7 @@ def GetJobs_Task():
             + "&jt="
             + job_Type
             + "&fromage="
-            + max_age
+            + str(max_age)
             + "&start="
             + str(start)
         )
