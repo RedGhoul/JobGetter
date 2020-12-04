@@ -1,21 +1,42 @@
-import datetime
-import logging
 import requests
-import bs4
 from bs4 import BeautifulSoup
 import time
-from datetime import datetime
 import json
-import os
 from decouple import config
-import threading
-from jobber.models import JobPositionItem, JobCitySetItem, JobTypeFind, MaxResultsPerCity, Host, JobTransparencyLinks,MaxAge
-#pip freeze > requirements.txt
-def GetJobs_Task():
-    header = {
-        "Content-type": "application/json",
-        "Accept": "text/plain",
-    }
+import random
+from fake_useragent import UserAgent
+from jobber.models import JobPositionItem, JobCitySetItem, JobTypeFind, MaxResultsPerCity, Host, JobTransparencyLinks, \
+    MaxAge
+
+
+# pip freeze > requirements.txt
+def Get_Jobs_Task():
+    def send_simple_message(JobsFound, ElapsedTime):
+        return requests.post(
+            "https://api.mailgun.net/v3/experimentsinthedeep2.com/messages",
+            auth=("api", config('YOUR_API_KEY', default='JobGetter')),
+            data={"from": "JobGetter@experimentsinthedeep2.com",
+                  "to": ["avaneesab5@gmail.com"],
+                  "subject": "Job Status - JobGetter",
+                  "text":
+                      f'Total Number of Jobs Found: {str(JobsFound)} ' +
+                      f'& Total Time Taken {str(ElapsedTime)}'})
+
+    def check_if_dup(description, url, title):
+        header = {
+            "Content-type": "application/json",
+            "Accept": "text/plain",
+        }
+        data = json.dumps({"description": description, "url": url, "title": title})
+        response = requests.post(url=techTransCheck, data=data, headers=header)
+        time.sleep(1)
+        if response.text == 'false':
+            return False
+        elif response.text == 'true':
+            return True
+        else:
+            return False
+
     jobs_done = []
     max_results_per_city = MaxResultsPerCity.objects.first().MaxNumber
     postionFind = []
@@ -33,18 +54,13 @@ def GetJobs_Task():
     techTrans = JobTransparencyLinks.objects.first().TechTrans
     techTransCheck = JobTransparencyLinks.objects.first().TechTransCheck
 
-    def checkifdup(description, url, title):
-        data = json.dumps({"description": description,"url":url,"title":title})
-        response = requests.post(url=techTransCheck, data=data, headers=header)
-        time.sleep(1)
-        if response.text == 'false':
-            return False
-        elif response.text == 'true':
-            return True
-        else:
-            return False
-
-    def dotheWork(city, pos, start, finalFileName):
+    def make_indeed_request(city, pos, start):
+        ua = UserAgent().ie
+        headers = {
+            "Content-type": "application/json",
+            "Accept": "text/plain",
+            'User-Agent': ua
+        }
         page = requests.get(
             "http://"
             + host
@@ -57,16 +73,15 @@ def GetJobs_Task():
             + "&fromage="
             + str(max_age)
             + "&start="
-            + str(start)
+            + str(start),
+            headers=headers
         )
-        time.sleep(1)  # ensuring at least 1 second between page grabs
         soup = BeautifulSoup(page.text, "html.parser")
         for each in soup.find_all(class_="result"):
             try:
                 title = each.find(class_="jobtitle").text.replace("\n", "").replace(",", "")
             except:
                 title = "NULL"
-            # print(title)
             job_URL = "NULL"
             try:
                 job_URL = (
@@ -88,7 +103,6 @@ def GetJobs_Task():
                             .replace("\n", "")
                             .replace(",", "")
                     )
-                    # print(synopsis)
                     if synopsis is None:
                         continue
             except:
@@ -118,7 +132,13 @@ def GetJobs_Task():
             except:
                 PostDate = "N/A"
             if job_URL != "NULL":
-                if checkifdup(synopsis, job_URL, title) == False:
+                if check_if_dup(synopsis, job_URL, title) == False:
+                    ua = UserAgent().ie
+                    headers = {
+                        "Content-type": "application/json",
+                        "Accept": "text/plain",
+                        'User-Agent': ua
+                    }
                     jobs_done.append("1")
                     body = {
                         "title": title,
@@ -135,49 +155,17 @@ def GetJobs_Task():
                         "posters": "None",
                     }
                     r = json.dumps(body)
-                    mainPage = requests.post(url=techTrans, data=r, headers=header)
+                    mainPage = requests.post(url=techTrans, data=r, headers=headers)
                 else:
                     print("Already found this Job")
 
-    def Indeed():
-        workers = []
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %H:%M:%S").replace(" ", "").replace(":", "")
-        finalFileName = ("JobPostingIndeed" + dt_string).replace("/", "")
+    start = time.time()
+    for city in city_set:
+        for pos in postionFind:
+            for start in range(0, max_results_per_city, 10):
+                time.sleep(random.randint(1, 6) * 5)
+                make_indeed_request(city, pos, start)
 
-        # scraping code:
-        for city in city_set:
-            for pos in postionFind:
-                for start in range(0, max_results_per_city, 10):
-                    thread1 = threading.Thread(
-                        target=dotheWork,
-                        args=(city, pos, start, city + pos + str(start) + finalFileName),
-                    )
-                    workers.append(thread1)
-
-        for process in workers:
-            process.start()
-
-        for process in workers:
-            process.join()
-
-    def startup():
-        start = time.time()
-        Indeed()
-        end = time.time()
-        total_time_needed = end - start
-        newJobCount = len(jobs_done)
-        send_simple_message(newJobCount,total_time_needed)
-
-    def send_simple_message(JobsFound, ElapsedTime):
-        return requests.post(
-            "https://api.mailgun.net/v3/experimentsinthedeep2.com/messages",
-            auth=("api",config('YOUR_API_KEY',default='JobGetter')),
-            data={"from": "JobGetter@experimentsinthedeep2.com",
-                  "to": ["avaneesab5@gmail.com"],
-                  "subject": "Job Status - JobGetter",
-                  "text":
-                      f'Total Number of Jobs Found: {str(JobsFound)} ' +
-                      f'& Total Time Taken {str(ElapsedTime)}'})
-
-    startup()
+    end = time.time()
+    total_time_needed = end - start
+    send_simple_message(len(jobs_done), total_time_needed)
