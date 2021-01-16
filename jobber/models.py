@@ -8,19 +8,19 @@ class MaxAge(models.Model):
         return str(self.Age)
 
 class JobPositionItem(models.Model):
-    Name = models.TextField(unique=True)
+    Name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.Name
 
 class JobCitySetItem(models.Model):
-    City = models.TextField(unique=True)
+    City = models.CharField(max_length=255)
 
     def __str__(self):
         return self.City
 
 class JobTypeFind(models.Model):
-    Jobtype = models.TextField(unique=True)
+    Jobtype = models.CharField(max_length=255)
 
     def __str__(self):
         return self.Jobtype
@@ -32,13 +32,13 @@ class MaxResultsPerCity(models.Model):
         return str(self.MaxNumber)
 
 class Host(models.Model):
-    Host = models.TextField(unique=True)
+    Host = models.TextField()
 
     def __str__(self):
         return self.Host
 
 class JobTransparencyLinks(models.Model):
-    TechTrans = models.TextField(unique=True)
-    TechTransCheck = models.TextField(unique=True)
+    TechTrans = models.CharField(max_length=500)
+    TechTransCheck = models.CharField(max_length=500)
     def __str__(self):
         return self.TechTrans
